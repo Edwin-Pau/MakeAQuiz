@@ -1,0 +1,17 @@
+button {
+    width: 5em;
+    margin-bottom: 1em;
+    margin-right: 0.5em;
+}
+
+#back-button {
+    width: 5em;
+}
+
+.user-type-button {
+    margin-right: 0.5em;
+}
+
+.key-words {
+    color: #CA4646
+}
