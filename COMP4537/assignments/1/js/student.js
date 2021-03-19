@@ -25,6 +25,14 @@ const keywordsArr = ["let", "var", "const", "for", "{", "}", "(", ")", "+", "-",
 let fetchedQuestionsArr = []
 let fetchedAnswersArr = []
 let completeQuestionsArr = []
+let lastSavedMessage;
+
+/**
+ * Helper functions
+ */
+const insertAfter = (newNode, existingNode) => {
+    existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling)
+}
 
 function checkAnswer(questionKey){
     let questionJson = localStorage.getItem(questionKey + 1)
@@ -66,6 +74,29 @@ function lockAnswers() {
     }
 }
 
+const displaySubmittedMessage = () => {
+    if (lastSavedMessage) {
+        lastSavedMessage.remove()
+    }
+
+    const divToInsertMessage = document.getElementById("testResult")
+    const savedMessage = document.createElement("div")
+    const date = new Date()
+
+    savedMessage.classList.add("alert")
+    savedMessage.classList.add("alert-primary")
+    savedMessage.classList.add("w-50")
+    savedMessage.classList.add("p-2")
+    savedMessage.setAttribute("role", "alert")
+    savedMessage.style.fontSize = "0.9em"
+    savedMessage.style.marginLeft = "20px"
+    savedMessage.style.width = "100px"
+    savedMessage.innerHTML = `Submitted on ${date}`
+
+    insertAfter(savedMessage, divToInsertMessage)
+    lastSavedMessage = savedMessage
+}
+
 function submit(){
     const numOfQuestions = localStorage.length - 1
     let numOfCorrectAnswer = 0
@@ -86,6 +117,8 @@ function submit(){
     scorePercentage = Math.round((numOfCorrectAnswer / numOfQuestions) * 100)
     testResult = "Score: " + numOfCorrectAnswer +"/" + numOfQuestions + " (" + scorePercentage + "%)"
     document.getElementById("testResult").innerHTML = testResult;
+
+    displaySubmittedMessage()
 }
 
 /**
@@ -166,15 +199,15 @@ const main = async () => {
             let qDiv = document.createElement("div");
             qDiv.setAttribute("id", vname);
             qDiv.classList.add("card");
-            qDiv.style.margin = "0.5em";
+            qDiv.style.marginBottom = "15px";
             document.getElementById("questionsStud").appendChild(qDiv);
 
             let pTitle = document.createElement("p");
             pTitle.innerHTML = "Question " + (i + 1);
             pTitle.style.color = "#920C15";
-            pTitle.style.marginTop = "0.5em";
-            pTitle.style.marginBottom = "0.5em";
-            pTitle.style.marginLeft = "1em";
+            pTitle.style.marginTop = "10px";
+            pTitle.style.marginBottom = "10px";
+            pTitle.style.marginLeft = "15px";
             pTitle.style.fontWeight = "bold";
             document.getElementById(vname).appendChild(pTitle);
 
@@ -189,9 +222,9 @@ const main = async () => {
             pQuestion.innerHTML = pQuestionRaw
             pQuestion.readOnly = "true";
             pQuestion.classList.add("form-control");
-            pQuestion.style.marginTop = "0.5em";
-            pQuestion.style.marginBottom = "0.5em";
-            pQuestion.style.marginLeft = "1em";
+            pQuestion.style.marginTop = "10px";
+            pQuestion.style.marginBottom = "10px";
+            pQuestion.style.marginLeft = "15px";
             pQuestion.style.height = "auto";
             pQuestion.style.width = "auto";
             pQuestion.style.minHeight = "20px";
@@ -199,9 +232,9 @@ const main = async () => {
 
             let pAnsTitle = document.createElement("p");
             pAnsTitle.innerHTML = "Answers*";
-            pAnsTitle.style.marginTop = "0.5em";
-            pAnsTitle.style.marginBottom = "0.5em";
-            pAnsTitle.style.marginLeft = "1em";
+            pAnsTitle.style.marginTop = "10px";
+            pAnsTitle.style.marginBottom = "10px";
+            pAnsTitle.style.marginLeft = "15px";
             pAnsTitle.style.fontWeight = "bold";
             document.getElementById(vname).appendChild(pAnsTitle);
             
@@ -224,8 +257,8 @@ const main = async () => {
                 radioAns[j].classList.add("col-sm-1");
                 radioAns[j].classList.add("col-form-label");
                 radioAns[j].classList.add("col-form-label-sm");
-                radioAns[j].style.marginTop = "0.9em"
-                radioAns[j].style.marginLeft = "1em"
+                radioAns[j].style.marginTop = "10px"
+                radioAns[j].style.marginLeft = "15px"
 
                 answerCoverter = {0:'a', 1: 'b', 2: 'c', 3: 'd'};
                 selection[j].readOnly = "true";
