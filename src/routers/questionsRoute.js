@@ -4,15 +4,53 @@ const { collectRequestData } = require('../utils/collectRequestData')
 const createQuestion = (query, req, res) => {
     try {
         collectRequestData(req, async (bodyObj) => {
-            const rowQuestions = await readWriteQuiz.insert("Questions", "QuestionData", `"${bodyObj.questionData}"`)
+            let columns = "QuestionData"
+            let values = `'${bodyObj.questionData}'`
+
+            if (bodyObj.correctAnswer) {
+                columns = "QuestionData, CorrectAnswer"
+                values = `'${bodyObj.questionData}', '${bodyObj.correctAnswer}'`
+            }
+
+            const rowQuestions = await readWriteQuiz.insert(
+                "Questions", 
+                columns, 
+                values
+            )
 
             const rowQuizzesQuestions = await readWriteQuiz.insert(
                 "QuizzesQuestions", 
                 "QuizzesID, QuestionsID", 
                 `${bodyObj.quizzesID}, ${rowQuestions.insertId}`
             )
+            
+            let responseObj = {
+                questionsID: rowQuestions.insertId
+            }
 
-            res.end(`200 OK Created new question with data ${bodyObj.questionData}!`);
+            res.end(JSON.stringify(responseObj));
+        })
+    } catch (err) {
+        console.log(err)
+        res.writeHead(404, {"Content-Type": "text/html"})
+        return res.end("500 Server error! Cannot create new quiz!")
+    }
+}
+
+const deleteQuestions = (query, req, res) => {
+    try {
+        collectRequestData(req, async (bodyObj) => {
+            const rowQuizzesQuestions = await readWriteQuiz.delete(
+                "QuizzesQuestions", 
+                `WHERE QuestionsID = ${bodyObj.questionsID}`
+            )
+
+            const rowQuestions = await readWriteQuiz.delete(
+                "Questions", 
+                `WHERE QuestionsID = ${bodyObj.questionsID}`
+            )
+
+            res.end(`200 OK Deleted question with ID ${bodyObj.questionsID}!`);
         })
     } catch (err) {
         console.log(err)
@@ -49,6 +87,10 @@ const handleRequest = (query, req, res) => {
 
     else if (req.method === "GET") {
         getQuestions(query, req, res)
+    }
+
+    else if (req.method === "PUT") {
+        deleteQuestions(query, req, res)
     }
 }
 

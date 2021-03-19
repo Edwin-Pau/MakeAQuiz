@@ -18,6 +18,23 @@ const createAnswer = (query, req, res) => {
     }
 }
 
+const deleteAnswers = (query, req, res) => {
+    try {
+        collectRequestData(req, async (bodyObj) => {
+            const rowAnswers = await readWriteQuiz.delete(
+                "Answers", 
+                `WHERE AnswersID = ${bodyObj.answersID}`
+            )
+
+            res.end(`200 OK Deleted answer with ID ${bodyObj.answersID}!`);
+        })
+    } catch (err) {
+        console.log(err)
+        res.writeHead(404, {"Content-Type": "text/html"})
+        return res.end("500 Server error! Cannot create new quiz!")
+    }
+}
+
 const getAnswers = async (query, req, res) => {
     try {
         selectQuery = 
@@ -44,6 +61,10 @@ const handleRequest = (query, req, res) => {
 
     else if (req.method === "GET") {
         getAnswers(query, req, res)
+    }
+
+    else if (req.method === "PUT") {
+        deleteAnswers(query, req, res)
     }
 }
 

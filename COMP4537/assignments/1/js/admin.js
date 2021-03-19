@@ -1,8 +1,17 @@
 /**
+ * Endpoints
+ */
+const getQuestionsEndpoint = "http://localhost:8080/COMP4537/assignments/1/questions"
+const getAnswersEndpoint = "http://localhost:8080/COMP4537/assignments/1/answers"
+
+/**
  * Script variables
  */
 let divToInsertQuestions = document.getElementById("insert-questions")
-let currentQuestionNum = localStorage.length + 1
+let currentQuestionNum;
+let lastSavedMessage;
+let fetchedQuestionsArr = []
+let fetchedAnswersArr = []
 
 /**
  * Maps a number to a letter for the MC answer and vice versa
@@ -19,12 +28,27 @@ let letterMapper = {
 }
 
 /**
+ * Render existing objects from local storage
+ */
+const renderQuestions = () => {
+    console.log("Rendering questions...")
+    console.log(currentQuestionNum)
+    
+    const parentNode = document.getElementById("insert-questions")
+    parentNode.innerHTML = ""
+    for (let i = 1; i < currentQuestionNum; i++) {
+        questionJson = localStorage.getItem(i)
+        questionObj = JSON.parse(questionJson)
+        buildMultipleChoiceQuestionHTML(questionObj)
+    }
+}
+
+/**
  * Helper functions
  */
 const insertAfter = (newNode, existingNode) => {
     existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling)
 }
-
 
 const setAnswers = (questionObj, answersArr) => {
     if (answersArr.length !== 4) {
@@ -154,16 +178,117 @@ const saveMultipleChoiceQuestions = () => {
         return
     }
 
-    for (let i = 0; i < questionsArr.length; i++) {
-        const questionJson = window.localStorage.getItem(i + 1)
+    for (let i = 1; i < questionsArr.length + 1; i++) {
+        const questionJson = window.localStorage.getItem(i)
         const questionObj = JSON.parse(questionJson)
-        questionObj.questionNumber = i + 1
-        questionObj.question = questionsArr[i]
-        questionObj.correctAnswer = correctAnswersArr[i]
-        setAnswers(questionObj, answersArr[i])
+        questionObj.questionNumber = i
+        questionObj.question = questionsArr[i-1]
+        questionObj.correctAnswer = correctAnswersArr[i-1]
+        setAnswers(questionObj, answersArr[i-1])
 
-        localStorage.setItem(i + 1, JSON.stringify(questionObj))
+        localStorage.setItem(i, JSON.stringify(questionObj))
     }
+}
+
+/**
+ * Sends POST request to our database using data from our local storage objects
+ */
+const saveQuestionsToDB = async () => {
+    for (let i = 1; i < localStorage.length; i++) {
+        let questionObj = JSON.parse(localStorage.getItem(i))
+        let selectedQuiz = localStorage.getItem("selectedQuiz")
+
+        let myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+    
+        let urlencoded = new URLSearchParams();
+        urlencoded.append("quizzesID", "" + selectedQuiz);
+        urlencoded.append("questionData", questionObj.question);
+    
+        if (questionObj.correctAnswer) {
+            urlencoded.append("correctAnswer", letterMapper[questionObj.correctAnswer]);
+        }
+
+        let requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: urlencoded,
+            redirect: 'follow'
+        };
+    
+        let questionResponse = await fetch(getQuestionsEndpoint, requestOptions)
+        let questionResponseJson = await questionResponse.json();
+        let insertedQuestionsID = questionResponseJson.questionsID
+        console.log(insertedQuestionsID)
+
+        for (let j = 0; j < Object.keys(questionObj.answers).length; j++) {
+            let myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+        
+            let urlencoded = new URLSearchParams();
+            urlencoded.append("questionsID", "" + insertedQuestionsID);
+            urlencoded.append("answerData", questionObj.answers[letterMapper[j]]);
+        
+            let requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: urlencoded,
+                redirect: 'follow'
+            };
+
+            await fetch(getAnswersEndpoint, requestOptions)
+        }
+    }
+    let fetchedQuestions = await fetchAllQuestions()
+    await fetchAllAnswers(fetchedQuestions)
+}
+
+/**
+ * Sends PUT request to delete the existing data from our database.
+ */
+const deleteQuestionsInDB = async () => {
+    for (answersArr of fetchedAnswersArr) {
+        
+        if (answersArr.length > 0) {
+            for (answer of answersArr) {
+                let myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+            
+                let urlencoded = new URLSearchParams();
+                urlencoded.append("answersID", "" + answer.AnswersID);
+            
+                let requestOptions = {
+                    method: 'PUT',
+                    headers: myHeaders,
+                    body: urlencoded,
+                    redirect: 'follow'
+                };
+            
+                await fetch(getAnswersEndpoint, requestOptions)
+            }
+        }
+    }
+    fetchedAnswersArr = []
+
+    if (fetchedQuestionsArr.length > 0) {
+        for (question of fetchedQuestionsArr) {
+            let myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+        
+            let urlencoded = new URLSearchParams();
+            urlencoded.append("questionsID", "" + question.QuestionsID);
+        
+            let requestOptions = {
+                method: 'PUT',
+                headers: myHeaders,
+                body: urlencoded,
+                redirect: 'follow'
+            };
+        
+            await fetch(getQuestionsEndpoint, requestOptions)
+        }
+    }
+    fetchedQuestionsArr = []
 }
 
 /**
@@ -179,6 +304,10 @@ const addButtonEventHandler = () => {
 }
 
 const displaySavedMessage = () => {
+    if (lastSavedMessage) {
+        lastSavedMessage.remove()
+    }
+
     const divToInsertMessage = document.getElementById("delete-button")
     const savedMessage = document.createElement("div")
     const date = new Date()
@@ -192,21 +321,20 @@ const displaySavedMessage = () => {
     savedMessage.innerHTML = `Last saved on ${date}`
 
     insertAfter(savedMessage, divToInsertMessage)
-    setTimeout(() => {
-        savedMessage.remove()
-    }, 2000)
+    lastSavedMessage = savedMessage
 }
 
-const saveButtonEventHandler = () => {
+const saveButtonEventHandler = async () => {
     console.log("Saving all multiple choice questions...")
     saveMultipleChoiceQuestions()
+    await deleteQuestionsInDB()
+    await saveQuestionsToDB()
     displaySavedMessage()
 }
 
 const deleteButtonEventHandler = () => {
-    if (localStorage.length > 0) {
+    if (localStorage.length > 1) {
         console.log("Deleting the last multiple choice question...")
-        saveMultipleChoiceQuestions()
 
         localStorage.removeItem(currentQuestionNum - 1)
 
@@ -214,22 +342,58 @@ const deleteButtonEventHandler = () => {
             currentQuestionNum--
         }
 
-        const parentNode = document.getElementById("insert-questions")
-        parentNode.innerHTML = ""
-
         renderQuestions()
     }
 }
 
 /**
- * Render existing objects from local storage
+ * Fetch all questions from the database
  */
-const renderQuestions = () => {
-    for (let i = 0; i < localStorage.length; i++) {
-        questionJson = localStorage.getItem(i + 1)
-        questionObj = JSON.parse(questionJson)
-        buildMultipleChoiceQuestionHTML(questionObj)
+const fetchAllQuestions = async () => {
+    fetchedQuestionsArr = []
+    let selectedQuiz = localStorage.getItem("selectedQuiz")
+
+    const response = await fetch(getQuestionsEndpoint + `?quizzesID=${selectedQuiz}`);
+    const questionsArr = await response.json();
+
+    console.log(questionsArr)
+    fetchedQuestionsArr = questionsArr
+    return fetchedQuestionsArr
+}
+
+const fetchAllAnswers = async (questionsArr) => {
+    fetchedAnswersArr = []
+    for (let i = 0; i < questionsArr.length; i++) {
+        const response = await fetch(getAnswersEndpoint + `?questionsID=${questionsArr[i].QuestionsID}`);
+        const answers = await response.json();
+        console.log(answers)
+        fetchedAnswersArr.push(answers)
     }
+    return fetchedAnswersArr
+}
+
+const fetchCompleteQuestions = (questionsArr, answersArr) => {
+    let fetchedCompleteQuestionsArr = []
+    for (let i = 0; i < questionsArr.length; i++) {
+
+        let fetchedAnswers = {
+            a: answersArr[i][0]?.AnswerData || "",
+            b: answersArr[i][1]?.AnswerData || "",
+            c: answersArr[i][2]?.AnswerData || "",
+            d: answersArr[i][3]?.AnswerData || ""
+        }
+
+        let fetchedCompleteQuestion = {
+            questionNumber: i + 1,
+            question: questionsArr[i].QuestionData,
+            answers: fetchedAnswers,
+            correctAnswer: letterMapper[questionsArr[i].CorrectAnswer] || null
+        }
+        fetchedCompleteQuestionsArr.push(fetchedCompleteQuestion)
+        localStorage.setItem("" + (i + 1), JSON.stringify(fetchedCompleteQuestion))
+    }
+    currentQuestionNum = localStorage.length
+    return fetchedCompleteQuestionsArr
 }
 
 /**
@@ -244,10 +408,15 @@ const addButtonListeners = () => {
 /**
  * Entry point to the script
  */
-const main = () => {
+const main = async () => {
+    fetchedQuestionsArr = await fetchAllQuestions()
+    fetchedAnswersArr = await fetchAllAnswers(fetchedQuestionsArr)
+    
+    let completeQuestionsArr = fetchCompleteQuestions(fetchedQuestionsArr, fetchedAnswersArr)
+    for (question of completeQuestionsArr) {
+        buildMultipleChoiceQuestionHTML(question)
+    }
     addButtonListeners()
-    renderQuestions()
-    setInterval(saveButtonEventHandler, 2000)
 }
 
 main()

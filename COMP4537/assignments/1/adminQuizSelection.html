@@ -9,8 +9,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link rel="stylesheet" href="../../../../public/css/global.css">
         <link rel="stylesheet" href="./css/assignment1.css">
-        <script src="./js/MultipleChoiceQuestion.js"></script>
-        <script defer src="./js/admin.js"></script>
+        <script defer src="./js/adminQuizSelection.js"></script>
 	</head>
 
 	<body>
@@ -27,18 +26,36 @@
             </ul>
         </nav>
 
-        <h2 class="pageTitle"><img class="icons" src="../../../../public/images/tech.svg" alt="tech">Database Quiz - Admin</h2>
+        <h2 class="pageTitle"><img class="icons" src="../../../../public/images/tech.svg" alt="tech">Admin - Select a Quiz</h2>
 
         <div class="griddisplay1">
-            <div id="insert-questions"></div>
-            <span>
-                <button id="add-button" type="button" class="btn btn-success" >Add</button>
-                <button id="save-button" type="button" class="btn btn-primary">Save</button>
-                <button id="delete-button" type="button" class="btn btn-danger">Delete</button>
-            </span>
+            <form>
+                <div class="form-group">
+                  <label>Edit an Existing Quiz</label>
+                  <small class="form-text text-muted">Click on an existing quiz to edit the questions.</small>
+                </div>
+            </form>
+
+            <div id="insert-quizzes"></div>
+
+            <hr>
 
             <div>
-                <a id="back-button" class="btn btn-info" href="adminQuizSelection.html" role="button">Back</a>
+                <form>
+                    <div class="form-group">
+                      <label for="quizTitleInput">Create a New Quiz</label>
+                      <small class="form-text text-muted">Enter a title for the new quiz and click on New.</small>
+                      <input type="text" class="form-control" id="quizTitleInput" aria-describedby="emailHelp" placeholder="Enter a quiz title">
+                    </div>
+                </form>
+            </div>
+
+            <div>
+                <button id="add-button" type="button" class="btn btn-success">New</button>
+            </div>
+
+            <div>
+                <a id="back-button" class="btn btn-info" href="index.html" role="button">Back</a>
             </div>
         </div>
         

@@ -26,13 +26,14 @@ const createTableQueries = {
 
     createQuestionsTableQuery: [[
         'CREATE TABLE IF NOT EXISTS Questions',
-        '(QuestionsID int AUTO_INCREMENT PRIMARY KEY,',
-        'QuestionData VARCHAR(511))'
+        '(QuestionsID INT AUTO_INCREMENT PRIMARY KEY,',
+        'QuestionData VARCHAR(511),',
+        'CorrectAnswer INT)'
     ].join(' '), 'Questions'],
 
     createAnswersTableQuery: [[
         'CREATE TABLE IF NOT EXISTS Answers',
-        '(AnswersID int AUTO_INCREMENT PRIMARY KEY,',
+        '(AnswersID INT AUTO_INCREMENT PRIMARY KEY,',
         'AnswerData VARCHAR(511),',
         'QuestionsID INT,',
         'FOREIGN KEY(QuestionsID) REFERENCES Questions(QuestionsID))'
@@ -103,7 +104,7 @@ const readWriteQuiz = {
     },
 
     /**
-     * Inserts new data into the database.
+     * Inserts new data into a table.
      */
     insert: async (tableName, columns, values) => {
         try {
@@ -113,6 +114,21 @@ const readWriteQuiz = {
             const insertQuery = `INSERT INTO ${tableName} (${columns}) VALUES (${values})`
             const rows = await query(insertQuery)
             console.log(`Inserted new record ${values} for columns ${columns} into ${tableName} table.`)
+            return rows
+        } catch(err) {
+            console.log(err)
+            throw err
+        }
+    },
+
+    /**
+     * Deletes rows in a table.
+     */
+    delete: async (tableName, condition) => {
+        try {
+            const deleteQuery = `DELETE FROM ${tableName} ${condition}`
+            const rows = await query(deleteQuery)
+            console.log(`Deleted ${rows.affectedRows} row(s).`)
             return rows
         } catch(err) {
             console.log(err)
@@ -131,5 +147,7 @@ const readWriteQuiz = {
 
 // 3) Select
 // let result = await Quiz.select("SELECT * FROM Answers")
+
+// readWriteQuiz.createTables()
 
 module.exports.readWriteQuiz = readWriteQuiz

@@ -8,9 +8,10 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link rel="stylesheet" href="../../../../public/css/global.css">
-        <link deferred="deferred" rel="stylesheet" href="./css/assignment1.css">
+        <link rel="stylesheet" href="./css/assignment1.css">
+        <script defer src="./js/leaderboardQuizSelection.js"></script>
 	</head>
-        
+
 	<body>
         <div class="wrapper">
 
@@ -25,21 +26,16 @@
             </ul>
         </nav>
 
-        <h2 class="pageTitle"><img class="icons" src="../../../../public/images/tech.svg" alt="tech">Database Quiz - Home</h2>
+        <h2 class="pageTitle"><img class="icons" src="../../../../public/images/tech.svg" alt="tech">Leaderboard - Select a Quiz</h2>
 
         <div class="griddisplay1">
-            <p>Select a user type: </p>
-            <span>
-                <a class="btn btn-primary btn-lg user-type-button" href="/COMP4537/assignments/1/adminQuizSelection.html" role="button">Admin</a>
-                <a class="btn btn-primary btn-lg user-type-button" href="/COMP4537/assignments/1/studentQuizSelection.html" role="button">Student</a>
-            </span>
-            <hr>
-            <p>Check the leaderboard:</p>
-            <span>
-                <a class="btn btn-primary btn-lg user-type-button" href="/COMP4537/assignments/1/leaderboardQuizSelection.html" role="button">Leaderboard</a>
-            </span>
-        </div>
+            <div id="insert-quizzes"></div>
 
+            <div>
+                <a id="back-button" class="btn btn-info" href="index.html" role="button">Back</a>
+            </div>
+        </div>
+        
         <footer>
                 <p class="footer">Website created by Edwin Pau<br>
                 &copy; 2021 Edwin Pau All rights reserved.</p>

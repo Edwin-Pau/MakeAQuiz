@@ -1,4 +1,10 @@
 /**
+ * Endpoints
+ */
+const getQuestionsEndpoint = "http://localhost:8080/COMP4537/assignments/1/questions"
+const getAnswersEndpoint = "http://localhost:8080/COMP4537/assignments/1/answers"
+
+/**
  * Maps a number to a letter for the MC answer and vice versa
  */
 const letterMapper = {
@@ -16,8 +22,128 @@ const letterMapper = {
  * Array that contains key words to highlight
  */
 const keywordsArr = ["let", "var", "const", "for", "{", "}", "(", ")", "+", "-", "*", "/", "="]
+let fetchedQuestionsArr = []
+let fetchedAnswersArr = []
+let completeQuestionsArr = []
 
-const main = () => {
+function checkAnswer(questionKey){
+    let questionJson = localStorage.getItem(questionKey + 1)
+    let questionObj = JSON.parse(questionJson)
+    let correctAnswer = questionObj.correctAnswer
+    let userAnswer = null
+
+    for (let i = 0; i < 4; i++) {
+        if (document.getElementById("question"+questionKey+"radio"+i).checked) {
+            userAnswer = letterMapper[i]
+        }
+    }
+
+    for (let i = 0; i < 4; i++) {
+        if (letterMapper[userAnswer] === i) {
+            document.getElementById("question"+questionKey+i).style.color = "white"
+            document.getElementById("question"+questionKey+i).style.backgroundColor = "#CA4646"
+            document.getElementById("question"+questionKey+i).style.fontWeight = "bold"
+        }
+
+        if (letterMapper[correctAnswer] === i) {
+            document.getElementById("question"+questionKey+i).style.color = "white"
+            document.getElementById("question"+questionKey+i).style.backgroundColor = "#28A745"
+            document.getElementById("question"+questionKey+i).style.fontWeight = "bold"
+        } 
+    }
+
+    if (correctAnswer === userAnswer && correctAnswer !== null) {
+        return true
+    }
+    return false
+}
+
+function lockAnswers() {
+    for (let i = 0; i < localStorage.length; i++) {
+        for (let j=0; j<4;j++){
+            document.getElementById("question"+i+"radio"+j).setAttribute("disabled", "disabled");
+        }
+    }
+}
+
+function submit(){
+    const numOfQuestions = localStorage.length
+    let numOfCorrectAnswer = 0
+    let scorePercentage = 0
+    let testResult = ""
+
+    if (numOfQuestions === 0) {
+        return
+    }
+
+    lockAnswers()
+    for (let i = 0; i < localStorage.length; i++) {
+        if (checkAnswer(i)) {
+            numOfCorrectAnswer++
+        }
+    }
+
+    scorePercentage = Math.round((numOfCorrectAnswer / numOfQuestions) * 100)
+    testResult = "Score: " + numOfCorrectAnswer +"/" + numOfQuestions + " (" + scorePercentage + "%)"
+    document.getElementById("testResult").innerHTML = testResult;
+}
+
+/**
+ * Fetch all questions from the database
+ */
+const fetchAllQuestions = async () => {
+    fetchedQuestionsArr = []
+    let selectedQuiz = localStorage.getItem("selectedQuiz")
+
+    const response = await fetch(getQuestionsEndpoint + `?quizzesID=${selectedQuiz}`);
+    const questionsArr = await response.json();
+
+    console.log(questionsArr)
+    fetchedQuestionsArr = questionsArr
+    return fetchedQuestionsArr
+}
+
+const fetchAllAnswers = async (questionsArr) => {
+    fetchedAnswersArr = []
+    for (let i = 0; i < questionsArr.length; i++) {
+        const response = await fetch(getAnswersEndpoint + `?questionsID=${questionsArr[i].QuestionsID}`);
+        const answers = await response.json();
+        console.log(answers)
+        fetchedAnswersArr.push(answers)
+    }
+    return fetchedAnswersArr
+}
+
+const fetchCompleteQuestions = (questionsArr, answersArr) => {
+    let fetchedCompleteQuestionsArr = []
+    for (let i = 0; i < questionsArr.length; i++) {
+
+        let fetchedAnswers = {
+            a: answersArr[i][0]?.AnswerData || "",
+            b: answersArr[i][1]?.AnswerData || "",
+            c: answersArr[i][2]?.AnswerData || "",
+            d: answersArr[i][3]?.AnswerData || ""
+        }
+
+        let fetchedCompleteQuestion = {
+            questionNumber: i + 1,
+            question: questionsArr[i].QuestionData,
+            answers: fetchedAnswers,
+            correctAnswer: letterMapper[questionsArr[i].CorrectAnswer] || null
+        }
+        fetchedCompleteQuestionsArr.push(fetchedCompleteQuestion)
+        localStorage.setItem("" + (i + 1), JSON.stringify(fetchedCompleteQuestion))
+    }
+    currentQuestionNum = localStorage.length
+    return fetchedCompleteQuestionsArr
+}
+
+const main = async () => {
+    fetchedQuestionsArr = await fetchAllQuestions()
+    console.log(fetchedQuestionsArr)
+    fetchedAnswersArr = await fetchAllAnswers(fetchedQuestionsArr)
+    completeQuestionsArr = fetchCompleteQuestions(fetchedQuestionsArr, fetchedAnswersArr)
+
     const msg_notSupported = "Web Storage is not supported in this environment.";
     const msg_error = "There are no questions created for the quiz yet, please visit the Admin page to create questions first."
 
@@ -29,7 +155,7 @@ const main = () => {
     if (localStorage.length == 0 ){
         alert(msg_error);
     } else{
-        numOfQuestions = localStorage.length;
+        numOfQuestions = localStorage.length - 1;
         questions = [];
         numOfCorrectAnswer = 0;
 
@@ -119,65 +245,3 @@ const main = () => {
 }
 
 main()
-
-function checkAnswer(questionKey){
-    let questionJson = localStorage.getItem(questionKey + 1)
-    let questionObj = JSON.parse(questionJson)
-    let correctAnswer = questionObj.correctAnswer
-    let userAnswer = null
-
-    for (let i = 0; i < 4; i++) {
-        if (document.getElementById("question"+questionKey+"radio"+i).checked) {
-            userAnswer = letterMapper[i]
-        }
-    }
-
-    for (let i = 0; i < 4; i++) {
-        if (letterMapper[userAnswer] === i) {
-            document.getElementById("question"+questionKey+i).style.color = "white"
-            document.getElementById("question"+questionKey+i).style.backgroundColor = "#CA4646"
-            document.getElementById("question"+questionKey+i).style.fontWeight = "bold"
-        }
-
-        if (letterMapper[correctAnswer] === i) {
-            document.getElementById("question"+questionKey+i).style.color = "white"
-            document.getElementById("question"+questionKey+i).style.backgroundColor = "#28A745"
-            document.getElementById("question"+questionKey+i).style.fontWeight = "bold"
-        } 
-    }
-
-    if (correctAnswer === userAnswer && correctAnswer !== null) {
-        return true
-    }
-    return false
-}
-
-function lockAnswers() {
-    for (let i = 0; i < localStorage.length; i++) {
-        for (let j=0; j<4;j++){
-            document.getElementById("question"+i+"radio"+j).setAttribute("disabled", "disabled");
-        }
-    }
-}
-
-function submit(){
-    const numOfQuestions = localStorage.length
-    let numOfCorrectAnswer = 0
-    let scorePercentage = 0
-    let testResult = ""
-
-    if (numOfQuestions === 0) {
-        return
-    }
-
-    lockAnswers()
-    for (let i = 0; i < localStorage.length; i++) {
-        if (checkAnswer(i)) {
-            numOfCorrectAnswer++
-        }
-    }
-
-    scorePercentage = Math.round((numOfCorrectAnswer / numOfQuestions) * 100)
-    testResult = "Score: " + numOfCorrectAnswer +"/" + numOfQuestions + " (" + scorePercentage + "%)"
-    document.getElementById("testResult").innerHTML = testResult;
-}

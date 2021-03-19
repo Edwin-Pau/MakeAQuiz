@@ -4,8 +4,9 @@ const { collectRequestData } = require('../utils/collectRequestData')
 const createQuiz = (query, req, res) => {
     try {
         collectRequestData(req, async (bodyObj) => {
-            await readWriteQuiz.insert("Quizzes", "QuizTitle", `"${bodyObj.quizTitle}"`)
-            res.end(`200 OK Created new quiz with title ${bodyObj.quizTitle}!`);
+            let quizRow = await readWriteQuiz.insert("Quizzes", "QuizTitle", `"${bodyObj.quizTitle}"`)
+            res.writeHead(200, {"Content-Type": "text/html"})
+            res.end("" + quizRow.insertId);
         })
     } catch (err) {
         console.log(err)

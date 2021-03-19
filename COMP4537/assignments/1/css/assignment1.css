@@ -15,3 +15,8 @@ button {
 .key-words {
     color: #CA4646
 }
+
+.quiz-card:hover {
+    cursor: pointer;
+}
+
