@@ -78,7 +78,7 @@ const addCardClickListener = (quizCard) => {
  * Entry point to the script
  */
 const main = async () => {
-    localStorage.setItem("selectedQuiz", null)
+    localStorage.clear()
 
     const quizzesArr = await fetchQuizzes()
     quizzesArr.forEach(quizObj => {

@@ -59,7 +59,7 @@ function checkAnswer(questionKey){
 }
 
 function lockAnswers() {
-    for (let i = 0; i < localStorage.length; i++) {
+    for (let i = 0; i < localStorage.length - 1; i++) {
         for (let j=0; j<4;j++){
             document.getElementById("question"+i+"radio"+j).setAttribute("disabled", "disabled");
         }
@@ -67,7 +67,7 @@ function lockAnswers() {
 }
 
 function submit(){
-    const numOfQuestions = localStorage.length
+    const numOfQuestions = localStorage.length - 1
     let numOfCorrectAnswer = 0
     let scorePercentage = 0
     let testResult = ""
@@ -77,7 +77,7 @@ function submit(){
     }
 
     lockAnswers()
-    for (let i = 0; i < localStorage.length; i++) {
+    for (let i = 0; i < localStorage.length - 1; i++) {
         if (checkAnswer(i)) {
             numOfCorrectAnswer++
         }
