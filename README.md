@@ -74,7 +74,8 @@ POST /COMP4537/assignments/1/questions
 Request body:
 ```
 {
-    questionData: "This is the question's data"
+    questionData: "This is the question's data",
+    correctAnswer: 0
 }
 ```
 
@@ -117,6 +118,46 @@ Request body:
 {
     answerData: "This is the data for an answer.",
     questionsID: 4
+}
+```
+
+Example JSON API response:
+```
+"200 OK Created new question with data..."
+```
+
+## Scores
+
+Get all scores for a specific quiz using quizzesID in the query string.
+```
+GET /COMP4537/assignments/1/scores?quizzesID=4
+```
+
+Example JSON API response:
+```
+[
+    {
+        "ScoresID": 2,
+        "Username": "Eddie",
+        "UsersID": 2, 
+        "QuizzesID": 2,
+        "TotalScore": 3,
+        "PercentScore": 100
+    }
+]
+```
+<hr>
+Create a new score for a quiz.
+
+```
+POST /COMP4537/assignments/1/scores
+```
+
+Request body:
+```
+{
+    totalScore: 5,
+    scorePercentage: 100
 }
 ```
 
