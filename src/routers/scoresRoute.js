@@ -16,7 +16,6 @@ const createScore = (query, req, res) => {
             let responseObj = {
                 scoresID: rowScores.insertId
             }
-
             res.end(JSON.stringify(responseObj));
         })
     } catch (err) {

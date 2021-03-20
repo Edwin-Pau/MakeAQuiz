@@ -1,11 +1,17 @@
 /**
  * Endpoints
  */
-const getQuestionsEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/questions"
-const getAnswersEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/answers"
-const getScoresEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
-const getQuizzesEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/quizzes"
+// let getQuestionsEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/questions"
+// let getAnswersEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/answers"
+// let getScoresEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
+// let getQuizzesEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/quizzes"
+let currentURL = window.location.href
+let getQuestionsEndpoint = currentURL + "/COMP4537/assignments/1/questions"
+let getAnswersEndpoint = currentURL + "/COMP4537/assignments/1/answers"
+let getScoresEndpoint = currentURL + "/COMP4537/assignments/1/scores"
+let getQuizzesEndpoint = currentURL + "/COMP4537/assignments/1/quizzes"
 
+console.log(getQuestionsEndpoint)
 /**
  * Maps a number to a letter for the MC answer and vice versa
  */

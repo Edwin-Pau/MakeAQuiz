@@ -1,16 +1,40 @@
 /**
  * Endpoints
  */
-const getQuestionsEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/questions"
-const getAnswersEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/answers"
-const getScoresEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
-const getQuizzesEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/quizzes"
+// let getQuestionsEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/questions"
+// let getAnswersEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/answers"
+// let getScoresEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
+// let getQuizzesEndpoint = "https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/quizzes"
+let currentURL = window.location.href
+let getQuestionsEndpoint = currentURL + "/COMP4537/assignments/1/questions"
+let getAnswersEndpoint = currentURL + "/COMP4537/assignments/1/answers"
+let getScoresEndpoint = currentURL + "/COMP4537/assignments/1/scores"
+let getQuizzesEndpoint = currentURL + "/COMP4537/assignments/1/quizzes"
+
+console.log(getQuestionsEndpoint)
 
 /**
  * Script variables
  */
 let divToInsertScores = document.getElementById("insert-scores")
 let fetchedScoresArr = []
+
+/**
+ * Helper functions
+ */
+const insertAfter = (newNode, existingNode) => {
+    existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling)
+}
+
+const compare = (a, b) => {
+    if (a.TotalScore > b.TotalScore ){
+      return 1;
+    }
+    if (a.TotalScore < b.TotalScore ){
+      return -1;
+    }
+    return 0;
+}
 
 /**
  * Render existing objects from local storage
@@ -22,32 +46,15 @@ const renderScores = () => {
     parentNode.innerHTML = ""
 
     fetchedScoresArr.sort(compare)
+
     fetchedScoresArr = fetchedScoresArr.reverse()
 
-    console.log(fetchedScoresArr)
     for (let i = 0; i < fetchedScoresArr.length; i++) {
         let newScoreCard = buildScoreCardHTML(fetchedScoresArr[i], i)
         insertAfter(newScoreCard, divToInsertScores)
         divToInsertScores = newScoreCard
     }
 }
-
-/**
- * Helper functions
- */
-const insertAfter = (newNode, existingNode) => {
-    existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling)
-}
-
-const compare = (a, b) => {
-    if (a.totalScore > b.totalScore ){
-      return 1;
-    }
-    if (a.totalScore < b.totalScore ){
-      return -1;
-    }
-    return 0;
-  }
 
 /**
  * Build the card element for the question
