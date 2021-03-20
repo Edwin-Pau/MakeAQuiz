@@ -1,8 +1,10 @@
 /**
  * Endpoints
  */
-const getQuestionsEndpoint = "http://localhost:8080/COMP4537/assignments/1/questions"
-const getAnswersEndpoint = "http://localhost:8080/COMP4537/assignments/1/answers"
+const getQuestionsEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/questions"
+const getAnswersEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/answers"
+const getScoresEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
+const getQuizzesEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
 
 /**
  * Script variables
@@ -308,7 +310,7 @@ const displaySavedMessage = () => {
         lastSavedMessage.remove()
     }
 
-    const divToInsertMessage = document.getElementById("delete-button")
+    const divToInsertMessage = document.getElementById("save-spinner")
     const savedMessage = document.createElement("div")
     const date = new Date()
 
@@ -326,10 +328,12 @@ const displaySavedMessage = () => {
 
 const saveButtonEventHandler = async () => {
     console.log("Saving all multiple choice questions...")
+    document.getElementById("save-spinner").style.visibility = "visible"
     saveMultipleChoiceQuestions()
     await deleteQuestionsInDB()
     await saveQuestionsToDB()
     displaySavedMessage()
+    document.getElementById("save-spinner").style.visibility = "hidden"
 }
 
 const deleteButtonEventHandler = () => {

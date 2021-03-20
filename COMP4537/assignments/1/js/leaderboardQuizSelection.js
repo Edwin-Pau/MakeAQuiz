@@ -1,7 +1,10 @@
 /**
  * Endpoints
  */
-const getQuizzesEndpoint = "http://localhost:8080/COMP4537/assignments/1/quizzes"
+const getQuestionsEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/questions"
+const getAnswersEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/answers"
+const getScoresEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
+const getQuizzesEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
 
 /**
  * Script variables

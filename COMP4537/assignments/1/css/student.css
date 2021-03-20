@@ -3,7 +3,8 @@ body {
 }
 
 #testResult {
-    margin: 1em;
-    font-size: x-large;
+    margin-left: 3px;
+    margin-bottom: 10px;
+    font-size: 1.5em;
     font-weight: bold;
 }

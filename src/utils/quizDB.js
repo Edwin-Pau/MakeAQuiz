@@ -57,9 +57,11 @@ const createTableQueries = {
     createScoresTableQuery: [
         "CREATE TABLE IF NOT EXISTS Scores (" +
             "ScoresID INT AUTO_INCREMENT PRIMARY KEY," +
+            "Username VARCHAR(511)," + 
             "UsersID INT," +
             "QuizzesID INT," +
             "TotalScore INT," +
+            "PercentScore INT," +
             "FOREIGN KEY(UsersID) REFERENCES Users(UsersID)," +
             "FOREIGN KEY(QuizzesID) REFERENCES Quizzes(QuizzesID)" +
         ")", 'Scores'],
@@ -148,6 +150,6 @@ const readWriteQuiz = {
 // 3) Select
 // let result = await Quiz.select("SELECT * FROM Answers")
 
-// readWriteQuiz.createTables()
+readWriteQuiz.createTables()
 
 module.exports.readWriteQuiz = readWriteQuiz

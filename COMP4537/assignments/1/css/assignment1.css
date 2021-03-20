@@ -20,3 +20,6 @@ button {
     cursor: pointer;
 }
 
+#save-spinner {
+    visibility: hidden;
+}

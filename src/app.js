@@ -4,6 +4,7 @@ const sf = require("./utils/serveFile")
 const quizzesRoute = require("./routers/quizzesRoute")
 const questionsRoute = require("./routers/questionsRoute")
 const answersRoute = require("./routers/answersRoute")
+const scoresRoute = require("./routers/scoresRoute")
 
 // Global variables
 const port = process.env.PORT || 8080
@@ -21,6 +22,10 @@ http.createServer((req, res) => {
 
     else if (query.pathname.includes("/assignments/1/answers")) {
         answersRoute.handleRequest(query, req, res)
+    }
+
+    else if (query.pathname.includes("/assignments/1/scores")) {
+        scoresRoute.handleRequest(query, req, res)
     }
 
     else {

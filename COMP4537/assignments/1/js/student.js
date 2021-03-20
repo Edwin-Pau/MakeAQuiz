@@ -1,8 +1,10 @@
 /**
  * Endpoints
  */
-const getQuestionsEndpoint = "http://localhost:8080/COMP4537/assignments/1/questions"
-const getAnswersEndpoint = "http://localhost:8080/COMP4537/assignments/1/answers"
+const getQuestionsEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/questions"
+const getAnswersEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/answers"
+const getScoresEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
+const getQuizzesEndpoint = "http://https://assignment1-comp4537.herokuapp.com/COMP4537/assignments/1/scores"
 
 /**
  * Maps a number to a letter for the MC answer and vice versa
@@ -89,7 +91,6 @@ const displaySubmittedMessage = () => {
     savedMessage.classList.add("p-2")
     savedMessage.setAttribute("role", "alert")
     savedMessage.style.fontSize = "0.9em"
-    savedMessage.style.marginLeft = "20px"
     savedMessage.style.width = "100px"
     savedMessage.innerHTML = `Submitted on ${date}`
 
@@ -97,11 +98,36 @@ const displaySubmittedMessage = () => {
     lastSavedMessage = savedMessage
 }
 
-function submit(){
+const submitScoreToDB = async (totalScore, percentScore, username) => {
+    let selectedQuiz = localStorage.getItem("selectedQuiz")
+
+    let myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    let urlencoded = new URLSearchParams();
+    urlencoded.append("quizzesID", "" + selectedQuiz);
+    urlencoded.append("totalScore", "" + totalScore);
+    urlencoded.append("percentScore", "" + percentScore);
+    urlencoded.append("username", username)
+
+    let requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: 'follow'
+    };
+
+    let scoreResponse = await fetch(getScoresEndpoint, requestOptions)
+    let scoreResponseJson = await scoreResponse.json()
+    console.log(scoreResponseJson)
+}
+
+const submit = async () => {
     const numOfQuestions = localStorage.length - 1
     let numOfCorrectAnswer = 0
     let scorePercentage = 0
     let testResult = ""
+    let username = document.getElementById("usernameInput").value
 
     if (numOfQuestions === 0) {
         return
@@ -118,6 +144,7 @@ function submit(){
     testResult = "Score: " + numOfCorrectAnswer +"/" + numOfQuestions + " (" + scorePercentage + "%)"
     document.getElementById("testResult").innerHTML = testResult;
 
+    await submitScoreToDB(numOfCorrectAnswer, scorePercentage, username)
     displaySubmittedMessage()
 }
 
