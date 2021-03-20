@@ -6,10 +6,10 @@ const serveFile = (query, req, res) => {
     let fileext = path.parse(query.pathname).ext
 
     if (query.pathname === "/") {
-        filename = "/COMP4537/assignments/1/index.html"
+        filename = "./COMP4537/assignments/1/index.html"
     }
 
-    fs.readFile("../" + filename, (err, data) => {
+    fs.readFile(filename, (err, data) => {
         try {
             let contentType = "text/html"
 
@@ -24,7 +24,8 @@ const serveFile = (query, req, res) => {
             if (fileext === ".txt") {
                 contentType = "text/plain"
             }
-
+            
+            // Allow browser to access response from any origin
             res.writeHead(200, {"Content-Type": `${contentType}`, "Access-Control-Allow-Origin": "*"})
             res.write(data)
             return res.end()
